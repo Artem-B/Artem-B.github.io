@@ -1,0 +1,84 @@
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-Light.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 200;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-Medium.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-Retina.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-Regular.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-SemiBold.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerd';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFont-Bold.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 700;
+}
+/* FiraCodeMono -- smaller icons */
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-Light.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 200;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-Medium.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-Retina.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-Regular.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-SemiBold.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'FiraCodeNerdMono';
+  src: url('https://artem-b.github.io/fonts/firacode/FiraCodeNerdFontMono-Bold.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 700;
+}
+

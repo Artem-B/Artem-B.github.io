@@ -1,0 +1,44 @@
+
+@font-face {
+  font-family: 'FiraMonoNerd';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFont-Regular.otf') format('opentype');
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'FiraMonoNerd';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFont-Medium.otf') format('opentype');
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'FiraMonoNerd';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFont-Bold.otf') format('opentype');
+  font-display: swap;
+  font-weight: 700;
+}
+/* FiraMonoMono -- smaller icons */
+
+@font-face {
+  font-family: 'FiraMonoNerdMono';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFontMono-Regular.otf') format('opentype');
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'FiraMonoNerdMono';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFontMono-Medium.otf') format('opentype');
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'FiraMonoNerdMono';
+  src: url('https://artem-b.github.io/fonts/firamono/FiraMonoNerdFontMono-Bold.otf') format('opentype');
+  font-display: swap;
+  font-weight: 700;
+}
+
