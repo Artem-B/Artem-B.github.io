@@ -1,21 +1,21 @@
 
 @font-face {
   font-family: 'FiraMonoNerd';
-  src: url('FiraMonoNerdFont-Regular.otf') format('opentype');
+  src: url('FiraMonoNerdFont-Regular.woff2') format('woff2'), url('FiraMonoNerdFont-Regular.otf') format('opentype');
   font-display: swap;
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'FiraMonoNerd';
-  src: url('FiraMonoNerdFont-Medium.otf') format('opentype');
+  src: url('FiraMonoNerdFont-Medium.woff2') format('woff2'), url('FiraMonoNerdFont-Medium.otf') format('opentype');
   font-display: swap;
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'FiraMonoNerd';
-  src: url('FiraMonoNerdFont-Bold.otf') format('opentype');
+  src: url('FiraMonoNerdFont-Bold.woff2') format('woff2'), url('FiraMonoNerdFont-Bold.otf') format('opentype');
   font-display: swap;
   font-weight: 700;
 }
@@ -23,21 +23,21 @@
 
 @font-face {
   font-family: 'FiraMonoNerdMono';
-  src: url('FiraMonoNerdFontMono-Regular.otf') format('opentype');
+  src: url('FiraMonoNerdFontMono-Regular.woff2') format('woff2'), url('FiraMonoNerdFontMono-Regular.otf') format('opentype');
   font-display: swap;
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'FiraMonoNerdMono';
-  src: url('FiraMonoNerdFontMono-Medium.otf') format('opentype');
+  src: url('FiraMonoNerdFontMono-Medium.woff2') format('woff2'), url('FiraMonoNerdFontMono-Medium.otf') format('opentype');
   font-display: swap;
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'FiraMonoNerdMono';
-  src: url('FiraMonoNerdFontMono-Bold.otf') format('opentype');
+  src: url('FiraMonoNerdFontMono-Bold.woff2') format('woff2'), url('FiraMonoNerdFontMono-Bold.otf') format('opentype');
   font-display: swap;
   font-weight: 700;
 }
