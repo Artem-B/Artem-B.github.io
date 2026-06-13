@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owon SCPI Web Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=version-0.1">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar: Command Library & Categories -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <div class="brand-icon"><i class="fa-solid fa-wave-square"></i></div>
+                    <h2>OWON<span>WEB</span></h2>
+                </div>
+                <div class="brand-version" id="brand-version"></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-header">Control Subsystems</div>
+                <button class="nav-item active" data-target="panel-measure">
+                    <i class="fa-solid fa-chart-simple"></i> Measurements
+                </button>
+                <button class="nav-item" data-target="panel-funcgen">
+                    <i class="fa-solid fa-wave-triangle"></i> Func Gen
+                </button>
+                <button class="nav-item" data-target="panel-dmm">
+                    <i class="fa-solid fa-gauge-high"></i> Multimeter
+                </button>
+                <button class="nav-item" data-target="panel-cursors">
+                    <i class="fa-solid fa-arrows-left-right-to-line"></i> Cursors
+                </button>
+            </nav>
+
+            <div class="connection-card">
+                <div class="status-dot disconnected" id="status-indicator"></div>
+                <div class="connection-info">
+                    <div class="status-text" id="connection-status">Disconnected</div>
+                    <div class="device-text" id="connected-device-name">No Device Selected</div>
+                </div>
+                <button id="connect-btn" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-plug"></i> Connect USB
+                </button>
+                <button id="disconnect-btn" class="btn btn-danger btn-block hidden">
+                    <i class="fa-solid fa-plug-circle-xmark"></i> Disconnect
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top Dashboard Header -->
+            <header class="top-header">
+                <div class="device-info-bar">
+                    <div class="info-item">
+                        <span class="label">Manufacturer</span>
+                        <span class="value" id="info-mfr">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Model</span>
+                        <span class="value" id="info-model">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Firmware</span>
+                        <span class="value" id="info-fw">-</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-icon" title="Reset Oscilloscope" id="btn-reset-device">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                    <button class="btn btn-outline" id="btn-auto-set">
+                        AUTO
+                    </button>
+                </div>
+            </header>
+
+            <!-- Core Layout -->
+            <div class="workspace-grid">
+                <!-- Left Column: Instrument Display & Controls -->
+                <div class="workspace-left">
+                    <!-- Oscilloscope Screen Card -->
+                    <div class="card screen-card">
+                        <div class="card-header scope-status-bar">
+                            <div class="status-group-left">
+                                <div class="scope-status-badge" id="scope-trig-status">UNKNOWN</div>
+                                <button class="btn-run-stop" id="btn-run-stop" title="Toggle Run/Stop">
+                                    <i class="fa-solid fa-pause"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline" id="btn-cycle-acq">Acq: SAMP</button>
+                                <button class="btn btn-sm btn-outline" id="btn-cycle-mem">Mem: 4K</button>
+                            </div>
+                            <div class="viewport-toolbar" title="Waveform viewport">
+                                <canvas id="viewport-indicator" aria-label="Waveform viewport indicator"></canvas>
+                                <div class="trigger-offset-readout" id="trigger-offset-readout">0 s</div>
+                            </div>
+                            <div class="screen-controls">
+                                <button class="btn-toggle-ch ch1-btn" id="toggle-ch1" data-active="true">CH1</button>
+                                <button class="btn-toggle-ch ch2-btn" id="toggle-ch2" data-active="true">CH2</button>
+                                <button class="btn btn-sm btn-accent" id="btn-fetch-wave">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Fetch
+                                </button>
+                                <button class="btn btn-sm btn-outline" id="btn-auto-fetch">
+                                    LIVE
+                                </button>
+                            </div>
+                        </div>
+                        <div class="screen-wrapper">
+                            <canvas id="scope-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- SCPI Terminal Card (Moved below screen) -->
+                    <div class="card terminal-card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-terminal"></i> SCPI Terminal</div>
+                            <div class="terminal-actions">
+                                <label style="font-size: 0.8rem; margin-right: 10px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                    <input type="checkbox" id="toggle-debug-logs"> UI Debug
+                                </label>
+                                <button class="btn-clear" id="btn-clear-terminal" title="Clear Console">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="terminal-body" id="terminal-output">
+                            <div class="terminal-line system">Owon HDS200 SCPI Interface initialized.</div>
+                            <div class="terminal-line system">Click 'Connect USB' to select and attach device.</div>
+                        </div>
+                        <div class="terminal-footer">
+                            <form id="terminal-form">
+                                <span class="prompt">&gt;</span>
+                                <input type="text" id="terminal-input" placeholder="Enter SCPI command (e.g. *IDN?)" autocomplete="off">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Controls -->
+                <div class="workspace-right">
+                    <!-- Dynamic Control Panel -->
+                    <div class="card controls-card">
+                        <!-- Horizontal Panel -->
+                        <!-- Measurements Panel -->
+                        <div class="control-panel" id="panel-measure">
+                            <h3><i class="fa-solid fa-chart-simple"></i> Automatic Measurements</h3>
+                            <div class="control-grid">
+                                <div class="control-group">
+                                    <label>Display Table</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="meas-display" data-cmd-on=":MEASurement:DISPlay ON" data-cmd-off=":MEASurement:DISPlay OFF">
+                                        <label for="meas-display"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="measure-grid">
+                                <div class="measure-card">
+                                    <div class="m-label">CH1 Max</div>
+                                    <div class="m-value" id="m-ch1-max">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH1:MAX?" data-update="m-ch1-max">Query</button>
+                                </div>
+                                <div class="measure-card">
+                                    <div class="m-label">CH1 Peak-Peak</div>
+                                    <div class="m-value" id="m-ch1-pkpk">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH1:PKPK?" data-update="m-ch1-pkpk">Query</button>
+                                </div>
+                                <div class="measure-card">
+                                    <div class="m-label">CH1 Frequency</div>
+                                    <div class="m-value" id="m-ch1-freq">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH1:FREQuency?" data-update="m-ch1-freq">Query</button>
+                                </div>
+                                <div class="measure-card">
+                                    <div class="m-label">CH2 Max</div>
+                                    <div class="m-value" id="m-ch2-max">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH2:MAX?" data-update="m-ch2-max">Query</button>
+                                </div>
+                                <div class="measure-card">
+                                    <div class="m-label">CH2 Peak-Peak</div>
+                                    <div class="m-value" id="m-ch2-pkpk">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH2:PKPK?" data-update="m-ch2-pkpk">Query</button>
+                                </div>
+                                <div class="measure-card">
+                                    <div class="m-label">CH2 Frequency</div>
+                                    <div class="m-value" id="m-ch2-freq">--</div>
+                                    <button class="btn btn-xs scpi-query-btn" data-query=":MEASurement:CH2:FREQuency?" data-update="m-ch2-freq">Query</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Func Gen Panel -->
+                        <div class="control-panel hidden" id="panel-funcgen">
+                            <h3><i class="fa-solid fa-wave-triangle"></i> Waveform Generator</h3>
+                            <div class="control-grid">
+                                <div class="control-group">
+                                    <label>Output Status</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="fg-load" data-cmd-on=":FUNCtion:LOAD ON" data-cmd-off=":FUNCtion:LOAD OFF">
+                                        <label for="fg-load"></label>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Waveform Shape</label>
+                                    <select data-cmd-template=":FUNCtion {{value}}">
+                                        <option value="SINE">Sine</option>
+                                        <option value="SQUare">Square</option>
+                                        <option value="RAMP">Ramp</option>
+                                        <option value="PULSe">Pulse</option>
+                                        <option value="Sinc">Sinc</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label>Frequency</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" placeholder="e.g. 1000" id="fg-freq">
+                                        <button class="btn btn-sm scpi-template-btn" data-template=":FUNCtion:FREQuency {{value}}" data-source="fg-freq">Set Hz</button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Amplitude (Vpp)</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" placeholder="e.g. 2.0" id="fg-ampl">
+                                        <button class="btn btn-sm scpi-template-btn" data-template=":FUNCtion:AMPLitude {{value}}" data-source="fg-ampl">Set V</button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Offset</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" placeholder="e.g. 0" id="fg-offset">
+                                        <button class="btn btn-sm scpi-template-btn" data-template=":FUNCtion:OFFSet {{value}}" data-source="fg-offset">Set V</button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Duty Cycle</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" placeholder="e.g. 50" id="fg-duty">
+                                        <button class="btn btn-sm scpi-template-btn" data-template=":FUNCtion:DTYCycle {{value}}" data-source="fg-duty">Set %</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DMM Panel -->
+                        <div class="control-panel hidden" id="panel-dmm">
+                            <h3><i class="fa-solid fa-gauge-high"></i> Digital Multimeter</h3>
+                            <div class="control-grid">
+                                <div class="control-group">
+                                    <label>Function</label>
+                                    <select id="dmm-func" data-cmd-template=":DMM:CONFigure:{{value}}">
+                                        <option value="VOLTage:DC">Voltage DC</option>
+                                        <option value="VOLTage:AC">Voltage AC</option>
+                                        <option value="CURRent:DC">Current DC</option>
+                                        <option value="CURRent:AC">Current AC</option>
+                                        <option value="RESistance">Resistance</option>
+                                        <option value="DIODe">Diode</option>
+                                        <option value="CONTinuity">Continuity</option>
+                                        <option value="CAPacitance">Capacitance</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label>Auto Range</label>
+                                    <button class="btn btn-outline scpi-btn" data-cmd=":DMM:AUTO ON">Enable Auto</button>
+                                </div>
+                                <div class="control-group">
+                                    <label>Relative Mode</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="dmm-rel" data-cmd-on=":DMM:REL ON" data-cmd-off=":DMM:REL OFF">
+                                        <label for="dmm-rel"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dmm-display">
+                                <div class="dmm-header">Live Reading</div>
+                                <div class="dmm-value-wrapper">
+                                    <span class="dmm-val" id="dmm-measured-value">--.---</span>
+                                    <span class="dmm-unit" id="dmm-unit-label">?</span>
+                                </div>
+                                <div class="dmm-controls">
+                                    <button class="btn btn-accent" id="btn-query-dmm">
+                                        <i class="fa-solid fa-bolt"></i> Single Measure
+                                    </button>
+                                    <button class="btn btn-outline" id="btn-poll-dmm">
+                                        Continuous
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cursors Panel -->
+                        <div class="control-panel hidden" id="panel-cursors">
+                            <h3><i class="fa-solid fa-arrows-left-right-to-line"></i> Cursors</h3>
+                            <div class="control-grid">
+                                <div class="control-group" style="grid-column: span 2;">
+                                    <label>Enable Cursors</label>
+                                    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="toggle-switch" style="width: 40px;">
+                                                <input type="checkbox" id="cursor-t1-enabled">
+                                                <label for="cursor-t1-enabled"></label>
+                                            </div>
+                                            <span style="font-size: 0.85rem; color: var(--text-bright); display: flex; align-items: center; gap: 6px;">
+                                                <span class="cursor-indicator v-indicator"></span> T1
+                                            </span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="toggle-switch" style="width: 40px;">
+                                                <input type="checkbox" id="cursor-t2-enabled">
+                                                <label for="cursor-t2-enabled"></label>
+                                            </div>
+                                            <span style="font-size: 0.85rem; color: var(--text-bright); display: flex; align-items: center; gap: 6px;">
+                                                <span class="cursor-indicator v-indicator"></span> T2
+                                            </span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="toggle-switch" style="width: 40px;">
+                                                <input type="checkbox" id="cursor-v1-enabled">
+                                                <label for="cursor-v1-enabled"></label>
+                                            </div>
+                                            <span style="font-size: 0.85rem; color: var(--text-bright); display: flex; align-items: center; gap: 6px;">
+                                                <span class="cursor-indicator h-indicator"></span> V1
+                                            </span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="toggle-switch" style="width: 40px;">
+                                                <input type="checkbox" id="cursor-v2-enabled">
+                                                <label for="cursor-v2-enabled"></label>
+                                            </div>
+                                            <span style="font-size: 0.85rem; color: var(--text-bright); display: flex; align-items: center; gap: 6px;">
+                                                <span class="cursor-indicator h-indicator"></span> V2
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Cursor Source</label>
+                                    <select id="cursors-source">
+                                        <option value="CH1">CH1</option>
+                                        <option value="CH2">CH2</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label>Snap to Grid/Edges</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="cursors-snap" checked>
+                                        <label for="cursors-snap"></label>
+                                    </div>
+                                </div>
+                                <div class="control-group" style="justify-content: flex-end;">
+                                    <button class="btn btn-outline btn-sm" id="btn-reset-cursors" style="margin-top: 15px;">
+                                        Reset Positions
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="cursors-readout-card">
+                                <div class="readout-header">Measurements</div>
+                                <div class="readout-table">
+                                    <div class="readout-row header-row">
+                                        <span>Param</span>
+                                        <span>Value</span>
+                                    </div>
+                                    <div class="readout-row">
+                                        <span class="param-name"><span class="cursor-indicator v-indicator"></span> T1</span>
+                                        <span class="param-value" id="cursor-val-t1">--</span>
+                                    </div>
+                                    <div class="readout-row">
+                                        <span class="param-name"><span class="cursor-indicator v-indicator"></span> T2</span>
+                                        <span class="param-value" id="cursor-val-t2">--</span>
+                                    </div>
+                                    <div class="readout-row highlight-row">
+                                        <span class="param-name">dT (ΔX)</span>
+                                        <span class="param-value" id="cursor-val-dt">--</span>
+                                    </div>
+                                    <div class="readout-row highlight-row">
+                                        <span class="param-name">1/dT (Freq)</span>
+                                        <span class="param-value" id="cursor-val-freq">--</span>
+                                    </div>
+                                    <div class="readout-divider"></div>
+                                    <div class="readout-row">
+                                        <span class="param-name"><span class="cursor-indicator h-indicator"></span> V1</span>
+                                        <span class="param-value" id="cursor-val-v1">--</span>
+                                    </div>
+                                    <div class="readout-row">
+                                        <span class="param-name"><span class="cursor-indicator h-indicator"></span> V2</span>
+                                        <span class="param-value" id="cursor-val-v2">--</span>
+                                    </div>
+                                    <div class="readout-row highlight-row">
+                                        <span class="param-name">dV (ΔY)</span>
+                                        <span class="param-value" id="cursor-val-dv">--</span>
+                                    </div>
+                                    <div class="readout-divider"></div>
+                                    <div class="readout-row">
+                                        <span class="param-name">V(T1)</span>
+                                        <span class="param-value" id="cursor-val-vt1">--</span>
+                                    </div>
+                                    <div class="readout-row">
+                                        <span class="param-name">V(T2)</span>
+                                        <span class="param-value" id="cursor-val-vt2">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification container -->
+    <div id="notification-toast" class="toast hidden"></div>
+
+    <script src="app.js?v=version-0.1"></script>
+</body>
+</html>
